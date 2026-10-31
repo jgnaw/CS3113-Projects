@@ -286,81 +286,77 @@ void update()
 void render()
 {
     BeginDrawing();
+    //background texture
     Rectangle bgArea = {
         0.0f, 0.0f,
         static_cast<float>(gBackground.width),
         static_cast<float>(gBackground.height)
     };
-
     Rectangle bgDestinationArea = {
         0.0f,
         0.0f,
         static_cast<float>(SCREEN_WIDTH),
         static_cast<float>(SCREEN_HEIGHT)
     };
-
     DrawTexturePro(
         gBackground,
         bgArea, bgDestinationArea, {0.0f, 0.0f},
         0.0f, WHITE
     );
-
+    //thrust texture, follows rob
     Rectangle thrustArea = {
         0.0f, 0.0f,
         static_cast<float>(gThrust.width),
         static_cast<float>(gThrust.height)
     };
-
     Rectangle thrustDestinationArea = {
         gRob->getPosition().x,
         gRob->getPosition().y,
         40.0f,
         65.0f
     };
-
     Vector2 thrustOffset = {
         gRob->getScale().x / 2.0f,
         -gRob->getScale().y / 2.0f
     };
-
+    //explosion effect, for failed landings
     Rectangle deathArea = {
         0.0f, 0.0f,
         static_cast<float>(gDeathEffect.width),
         static_cast<float>(gDeathEffect.height)
     };
-
     Rectangle deathDestinationArea = {
         gRob->getPosition().x,
         gRob->getPosition().y,
         50.0f,
         40.0f
     };
-
     Vector2 deathOffset = {
         gRob->getScale().x / 2.0f,
         gRob->getScale().y / 2.0f
     };
-
+    //blast zone death effect texture, rob goes off to the side
     Rectangle bzArea = {
         0.0f, 0.0f,
         static_cast<float>(blastzonePos * gBlastzone.width),
         static_cast<float>(gBlastzone.height)
     };
-
     Rectangle bzDestinationArea = {
         blastzonePos == -1 ? 0 : static_cast<float>(SCREEN_WIDTH),
         gRob->getPosition().y,
         200.0f,
         100.0f
     };
-
+    //adjust direction of texture depending on where rob goes off screen
     Vector2 bzOffset = {
         blastzonePos == -1 ? gRob->getScale().x / 2.0f : 200 - gRob->getScale().x / 2.0f,
         gRob->getScale().y
     };
     if (gRob->isActive()) {
+        //render rob if actively moving or landed safely
         gRob->render();
         if (!roundOver){
+            //draw thrust texture if thrust is active and round is still going
             if (thrustActive) {
                 DrawTexturePro(
                     gThrust,
@@ -370,6 +366,7 @@ void render()
             }
         }
     }
+    //draw blast zone death texture if rob goes off to the side
     else if (gRob->getPosition().x - gRob->getScale().x / 2.0f > SCREEN_WIDTH ||
             gRob->getPosition().x + gRob->getScale().x / 2.0f < 0) {
             DrawTexturePro(
@@ -378,6 +375,7 @@ void render()
                 0.0f, WHITE
             );
     }
+    //draw explosion effect if rob dies
     else if (!gRob->isActive()) {
         DrawTexturePro(
             gDeathEffect,
@@ -385,16 +383,19 @@ void render()
             0.0f, WHITE
         );
     }
-    
+    //display mission success/failed message
     if (roundOver) {
         DrawText(landMessage, SCREEN_WIDTH / 2.0f -  MeasureText(landMessage, 20) / 2.0f, 0, 20, WHITE);
         if (potentialFuelLoss != 0) {
+            //display fuel lost if mission failed
             const char *fuelLost = TextFormat("%i fuel units lost", potentialFuelLoss);
             DrawText(fuelLost, SCREEN_WIDTH / 2.0f -  MeasureText(fuelLost, 20) / 2.0f, 30, 20, WHITE);
         }
     }
+    //render blocks and platform
     for (int i = 0; i < NUMBER_OF_BLOCKS; i++) gBlocks[i].render();
     gPlatform->render();
+    //render statistics (score, fuel, x and y velocities)
     const char *velocityY = TextFormat("Vertical Velocity: %i", int(impactVY));
     const char *velocityX = TextFormat("Horizontal Velocity: %i", int(impactVX));
     const char *fuelCount = TextFormat("Fuel: %i", (int)ceilf(fuel));
@@ -404,6 +405,7 @@ void render()
     DrawText(velocityY, SCREEN_WIDTH - MeasureText(velocityY, 20), 30, 20, WHITE);
     DrawText(fuelCount, 0, 30, 20, WHITE);
     DrawText(scoreTracker, 0, 0, 20, WHITE);
+    //display game over message if out of fuel
     if (fuel <= 0.0f) {
         DrawText(gameOver, SCREEN_WIDTH / 2.0f - MeasureText(gameOver, 30) / 2.0f, 100, 30, WHITE);
     }
