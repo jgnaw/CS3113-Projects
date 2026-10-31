@@ -83,7 +83,7 @@ void resetGame() {
 }
 void initialise()
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Lunar Lander");
     gBackground = LoadTexture(SSBU_BACKGROUND);
     gThrust = LoadTexture(ROB_THRUST);
     gDeathEffect = LoadTexture(DEATH_EFFECT);
